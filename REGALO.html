@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Raspa y Gana Fullscreen</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    height: 100vh;
+    width: 100vw;
+    background: #111;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100vw;
+    height: 100vh;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .cell {
+    position: relative;
+    background: linear-gradient(135deg, gold, orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8vw;
+    font-weight: bold;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    touch-action: none;
+  }
+
+  .locked::after {
+    content: "🔒";
+    position: absolute;
+    font-size: 10vw;
+    z-index: 2;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const premios = ["💰","⭐","🎁","🍀","🔥","🎉","💎","🎯","🏆"];
+const grid = document.getElementById("grid");
+
+let currentIndex = 0;
+
+function crearCuadro(index) {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  if (index !== 0) cell.classList.add("locked");
+
+  cell.textContent = premios[index];
+
+  const canvas = document.createElement("canvas");
+  cell.appendChild(canvas);
+  grid.appendChild(cell);
+
+  function resizeCanvas() {
+    canvas.width = cell.clientWidth;
+    canvas.height = cell.clientHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#aaa";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = "destination-out";
+  }
+
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  const ctx = canvas.getContext("2d");
+  let isDrawing = false;
+
+  function draw(e) {
+    if (!isDrawing || index !== currentIndex) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.beginPath();
+    ctx.arc(x, y, canvas.width * 0.12, 0, Math.PI * 2); // raspado rápido
+    ctx.fill();
+  }
+
+  function checkScratch() {
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let clear = 0;
+    for (let i = 3; i < img.data.length; i += 4) {
+      if (img.data[i] === 0) clear++;
+    }
+    if (clear / (canvas.width * canvas.height) > 0.35) unlock();
+  }
+
+  function unlock() {
+    canvas.remove();
+    cell.classList.remove("locked");
+    currentIndex++;
+    if (grid.children[currentIndex]) {
+      grid.children[currentIndex].classList.remove("locked");
+    }
+  }
+
+  canvas.addEventListener("touchstart", e => {
+    if (index !== currentIndex) return;
+    isDrawing = true;
+  });
+
+  canvas.addEventListener("touchmove", draw);
+  canvas.addEventListener("touchend", () => {
+    isDrawing = false;
+    checkScratch();
+  });
+
+  canvas.addEventListener("mousedown", () => isDrawing = true);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", () => {
+    isDrawing = false;
+    checkScratch();
+  });
+}
+
+premios.forEach((_, i) => crearCuadro(i));
+</script>
+
+</body>
+</html>
