@@ -146,7 +146,7 @@ const mensajes=[
 const finalMensaje=`🎶 “Si te quieres divertir,
 con encanto y con primor…”
 
-💙🐰 Bad Bunny
+🐰 Bad Bunny
 🎟️🎤 Concierto`;
 
 const adjetivosValidos=[
@@ -249,7 +249,7 @@ function mostrarOverlay(back){
     <div class="overlay-box">
       <div class="overlay-title">💭 Completa con adjetivos que siempre te digo…</div>
       <input class="word"><input class="word"><input class="word">
-      <button class="check">Comprobar 💙</button>
+      <button class="check">Comprobar</button>
       <div class="hint"></div>
     </div>`;
   document.body.appendChild(overlay);
@@ -257,7 +257,7 @@ function mostrarOverlay(back){
   overlay.querySelector(".check").onclick=()=>{
     const values=[...overlay.querySelectorAll(".word")].map(i=>i.value);
     if(values.map(normalizar).every(v=>validos.includes(v))){
-      back.innerHTML=`💙 Siempre eres:\n\n${values.join("\n")}`;
+      back.innerHTML=`Siempre eres:\n\n${values.join("\n")}`;
       overlay.remove();
       currentIndex++;
     }
