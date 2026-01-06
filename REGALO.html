@@ -170,7 +170,7 @@ const adjetivosValidos=[
  "inteligente","sonriente","risueña","ternurita"
 ];
 
-// NORMALIZAR
+// NORMALIZADOR (sin mayúsculas, tildes ni espacios)
 const normalizar=t=>t.toLowerCase()
   .normalize("NFD")
   .replace(/[\u0300-\u036f]/g,"")
@@ -178,13 +178,14 @@ const normalizar=t=>t.toLowerCase()
 
 const validosNormalizados=adjetivosValidos.map(normalizar);
 
+// 🧩 MENSAJES
 const mensajes=[
  "😅 Sigue intentando\nesto recién empieza",
  "😉 Vamos de nuevo\nconfía en mí",
  "ADJETIVOS",
  "🧸 Sorpresa:\nUn peluchito Plincito 💙",
  "📅 Anótalo bien:\n16 de enero",
- "📸 “Quizás debí tomar más fotos\nde cuando te tuve…”\n\n🎤 Bad Bunny 💙"
+ "🎶 “Si te quieres divertir,\ncon encanto y con primor…”\n\n💙🐰 Bad Bunny\n\nPorque contigo\ntodo se siente especial"
 ];
 
 const grid=document.getElementById("grid");
@@ -240,6 +241,7 @@ function crearCard(index){
 
   function unlock(){
     canvas.remove();
+    front.classList.remove("locked");
     card.classList.add("flip");
 
     const boom=document.createElement("div");
@@ -312,3 +314,4 @@ mensajes.forEach((_,i)=>crearCard(i));
 
 </body>
 </html>
+
