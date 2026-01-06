@@ -14,6 +14,7 @@ body{
   font-family:'Segoe UI',Arial,sans-serif;
 }
 
+/* GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -24,6 +25,7 @@ body{
   height:100%;
 }
 
+/* CARD */
 .card{perspective:1200px}
 .card-inner{
   width:100%;height:100%;
@@ -113,21 +115,34 @@ canvas{
 .final-screen{
   position:fixed;inset:0;z-index:3000;
   background:radial-gradient(circle,#b8ffff,#004b8d);
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   animation:finalIn .8s ease-out forwards;
 }
+
 @keyframes finalIn{
   from{opacity:0;transform:scale(.8)}
   to{opacity:1;transform:scale(1)}
 }
+
 .final-text{
   text-align:center;
   font-size:6.5vw;
   font-weight:900;
   color:#003b44;
+
+  max-width:85%;
+  line-height:1.5;
+  letter-spacing:0.5px;
+  white-space:pre-line;
+
+  padding:32px 24px;
+  margin:auto;
+
   animation:float 3s ease-in-out infinite;
-  padding:20px;
 }
+
 @keyframes float{
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-10px)}
@@ -159,8 +174,9 @@ con encanto y con primor…”
 💙🐰 Bad Bunny
 
 🎟️🎤 Concierto
-Porque contigo
-todo se siente especial`;
+
+Para que disfrute y tenga
+más recuerdos bonitos`;
 
 const adjetivosValidos=[
  "mi compa","linda","guapa","pechocha","bonita",
