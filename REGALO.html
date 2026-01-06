@@ -25,7 +25,7 @@ body{
   width:100vw;height:100vh;
 }
 
-/* CARD 3D */
+/* CARD */
 .card{perspective:1000px}
 .card-inner{
   position:relative;width:100%;height:100%;
@@ -59,11 +59,8 @@ body{
   transform:rotateY(180deg);
 }
 
-.final{
-  font-family:Georgia,serif;
-}
+.final{font-family:Georgia,serif}
 
-/* CANVAS */
 canvas{
   position:absolute;
   inset:0;
@@ -71,7 +68,6 @@ canvas{
   touch-action:none;
 }
 
-/* LOCK */
 .locked::after{
   content:"🔒";
   position:absolute;
@@ -79,33 +75,22 @@ canvas{
   z-index:3;
 }
 
-/* 💥 EXPLOSIÓN CELULAR */
+/* 💥 EXPLOSIÓN */
 .explosion{
   position:absolute;
   inset:0;
   border-radius:22px;
-  background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(111,252,255,.7) 30%, rgba(111,252,255,0) 70%);
+  background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(111,252,255,.7) 35%, rgba(111,252,255,0) 75%);
   animation:boom 1s ease-out forwards;
   pointer-events:none;
 }
-
 @keyframes boom{
-  0%{opacity:0;transform:scale(.3)}
-  40%{opacity:1;transform:scale(1)}
-  100%{opacity:0;transform:scale(1.4)}
+  0%{opacity:0;transform:scale(.4)}
+  50%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.5)}
 }
 
-/* PLINCITO */
-.plincito{
-  animation:bounce 1s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes bounce{
-  0%{transform:scale(.3)}
-  60%{transform:scale(1.2)}
-  100%{transform:scale(1)}
-}
-
-/* 📝 OVERLAY PANTALLA COMPLETA */
+/* 📝 OVERLAY */
 .overlay{
   position:fixed;
   inset:0;
@@ -114,51 +99,57 @@ canvas{
   display:flex;
   align-items:center;
   justify-content:center;
-  text-align:center;
   padding:24px;
   animation:fadeIn .5s ease;
 }
 
-@keyframes fadeIn{
-  from{opacity:0}
-  to{opacity:1}
-}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 .overlay-box{
   background:linear-gradient(135deg,#b8ffff,#5ad7e6);
-  border-radius:28px;
-  padding:28px;
+  border-radius:30px;
+  padding:32px 24px;
   width:100%;
   max-width:420px;
-  font-size:6vw;
-  font-weight:700;
+  text-align:center;
   color:#003b44;
 }
 
+.overlay-title{
+  font-size:6vw;
+  font-weight:800;
+  margin-bottom:20px;
+}
+
+/* INPUTS BONITOS */
 .word{
-  width:28%;
-  padding:10px;
-  margin:6px;
-  border-radius:14px;
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border-radius:18px;
   border:none;
   text-align:center;
   font-size:5vw;
+  font-weight:700;
+  outline:none;
 }
 
+/* BOTÓN */
 .check{
-  margin-top:14px;
-  padding:12px 20px;
+  margin-top:18px;
+  padding:14px;
+  width:100%;
   border:none;
-  border-radius:20px;
+  border-radius:22px;
   background:#004b8d;
   color:white;
-  font-weight:700;
-  font-size:4.5vw;
+  font-weight:800;
+  font-size:4.8vw;
 }
 
 .hint{
-  margin-top:12px;
-  font-size:4vw;
+  margin-top:16px;
+  font-size:4.5vw;
 }
 </style>
 </head>
@@ -168,16 +159,15 @@ canvas{
 <div class="grid" id="grid"></div>
 
 <script>
-// ✨ CAMBIA ESTOS ADJETIVOS
-const adjetivosCorrectos = ["hermosa","única","increíble"];
+const adjetivosCorrectos=["hermosa","única","increíble"];
 
-const mensajes = [
+const mensajes=[
  "😅 Sigue intentando\nesto recién empieza",
  "😉 Vamos de nuevo\nconfía en mí",
  "ADJETIVOS",
  "🧸 Sorpresa:\nUn peluchito Plincito 💙",
  "📅 Anótalo bien:\n16 de enero",
- "📸 “Quizás debí tomar más fotos\nde cuando te tuve…”\n\n🎤 Bad Bunny 💙\n\nPorque contigo\ntodo se siente mejor"
+ "📸 “Quizás debí tomar más fotos\nde cuando te tuve…”\n\n🎤 Bad Bunny 💙"
 ];
 
 const grid=document.getElementById("grid");
@@ -221,7 +211,7 @@ function crearCard(index){
     const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
     const y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
     ctx.beginPath();
-    ctx.arc(x,y,canvas.width*.2,0,Math.PI*2);
+    ctx.arc(x,y,canvas.width*.22,0,Math.PI*2);
     ctx.fill();
   }
 
@@ -243,34 +233,32 @@ function crearCard(index){
     setTimeout(()=>boom.remove(),1000);
 
     if(index===2){
-      mostrarOverlay();
+      setTimeout(mostrarOverlay,1200); // ⏳ pausa antes de la pregunta
       return;
     }
 
-    if(index===3) back.classList.add("plincito");
     currentIndex++;
   }
 
   canvas.addEventListener("touchstart",()=>{if(index===currentIndex)draw=true});
   canvas.addEventListener("touchmove",scratch);
   canvas.addEventListener("touchend",()=>{draw=false;check()});
-
   canvas.addEventListener("mousedown",()=>{if(index===currentIndex)draw=true});
   canvas.addEventListener("mousemove",scratch);
   canvas.addEventListener("mouseup",()=>{draw=false;check()});
 }
 
 function mostrarOverlay(){
+  let intentos=0;
+
   const overlay=document.createElement("div");
   overlay.className="overlay";
   overlay.innerHTML=`
     <div class="overlay-box">
-      💭 Completa lo que siempre te digo…<br><br>
-      Eres<br><br>
-      <input class="word">
-      <input class="word">
-      <input class="word">
-      <br>
+      <div class="overlay-title">💭 Completa lo que siempre te digo…</div>
+      <input class="word" placeholder="Eres…">
+      <input class="word" placeholder="Eres…">
+      <input class="word" placeholder="Eres…">
       <button class="check">Comprobar 💙</button>
       <div class="hint"></div>
     </div>
@@ -283,14 +271,18 @@ function mostrarOverlay(){
 
   btn.onclick=()=>{
     const values=[...inputs].map(i=>i.value.toLowerCase().trim());
+    intentos++;
+
     if(values.every(v=>adjetivosCorrectos.includes(v))){
       hint.textContent="💙 Exacto… siempre lo has sabido";
       setTimeout(()=>{
         overlay.remove();
         currentIndex++;
-      },800);
+      },900);
     }else{
-      hint.textContent="😉 Pista: te lo digo más de lo que crees";
+      hint.textContent=intentos===1
+        ?"kheeeeeeeeee no eres 😝"
+        :"Si sabesssss, tu puedesssss! 💙";
     }
   };
 }
