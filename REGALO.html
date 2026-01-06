@@ -25,7 +25,6 @@ body{
   width:100vw;height:100vh;
 }
 
-/* CARD */
 .card{perspective:1000px}
 .card-inner{
   position:relative;width:100%;height:100%;
@@ -59,8 +58,6 @@ body{
   transform:rotateY(180deg);
 }
 
-.final{font-family:Georgia,serif}
-
 canvas{
   position:absolute;
   inset:0;
@@ -75,14 +72,13 @@ canvas{
   z-index:3;
 }
 
-/* 💥 EXPLOSIÓN */
+/* EXPLOSIÓN */
 .explosion{
   position:absolute;
   inset:0;
   border-radius:22px;
   background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(111,252,255,.7) 35%, rgba(111,252,255,0) 75%);
   animation:boom 1s ease-out forwards;
-  pointer-events:none;
 }
 @keyframes boom{
   0%{opacity:0;transform:scale(.4)}
@@ -90,7 +86,7 @@ canvas{
   100%{opacity:0;transform:scale(1.5)}
 }
 
-/* 📝 OVERLAY */
+/* OVERLAY */
 .overlay{
   position:fixed;
   inset:0;
@@ -100,10 +96,7 @@ canvas{
   align-items:center;
   justify-content:center;
   padding:24px;
-  animation:fadeIn .5s ease;
 }
-
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 .overlay-box{
   background:linear-gradient(135deg,#b8ffff,#5ad7e6);
@@ -121,7 +114,6 @@ canvas{
   margin-bottom:20px;
 }
 
-/* INPUTS BONITOS */
 .word{
   width:100%;
   padding:14px;
@@ -134,7 +126,6 @@ canvas{
   outline:none;
 }
 
-/* BOTÓN */
 .check{
   margin-top:18px;
   padding:14px;
@@ -159,7 +150,22 @@ canvas{
 <div class="grid" id="grid"></div>
 
 <script>
-const adjetivosCorrectos=["hermosa","única","increíble"];
+// 💙 ADJETIVOS VÁLIDOS
+const adjetivosValidos = [
+  "mi compa","linda","guapa","pechocha","bonita",
+  "inteligente","sonriente","risueña","ternurita"
+];
+
+// 🔧 NORMALIZADOR
+function normalizar(texto){
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/\s+/g,"");
+}
+
+const validosNormalizados = adjetivosValidos.map(normalizar);
 
 const mensajes=[
  "😅 Sigue intentando\nesto recién empieza",
@@ -186,7 +192,6 @@ function crearCard(index){
   const back=document.createElement("div");
   back.className="face back";
   if(index!==2) back.textContent=mensajes[index];
-  if(index===5) back.classList.add("final");
 
   const canvas=document.createElement("canvas");
   front.appendChild(canvas);
@@ -224,7 +229,6 @@ function crearCard(index){
 
   function unlock(){
     canvas.remove();
-    front.classList.remove("locked");
     card.classList.add("flip");
 
     const boom=document.createElement("div");
@@ -233,10 +237,9 @@ function crearCard(index){
     setTimeout(()=>boom.remove(),1000);
 
     if(index===2){
-      setTimeout(mostrarOverlay,1200); // ⏳ pausa antes de la pregunta
+      setTimeout(mostrarOverlay,1200);
       return;
     }
-
     currentIndex++;
   }
 
@@ -250,7 +253,6 @@ function crearCard(index){
 
 function mostrarOverlay(){
   let intentos=0;
-
   const overlay=document.createElement("div");
   overlay.className="overlay";
   overlay.innerHTML=`
@@ -270,19 +272,21 @@ function mostrarOverlay(){
   const hint=overlay.querySelector(".hint");
 
   btn.onclick=()=>{
-    const values=[...inputs].map(i=>i.value.toLowerCase().trim());
+    const values=[...inputs].map(i=>normalizar(i.value));
     intentos++;
 
-    if(values.every(v=>adjetivosCorrectos.includes(v))){
+    const ok = values.every(v=>validosNormalizados.includes(v));
+
+    if(ok){
       hint.textContent="💙 Exacto… siempre lo has sabido";
       setTimeout(()=>{
         overlay.remove();
         currentIndex++;
       },900);
     }else{
-      hint.textContent=intentos===1
-        ?"kheeeeeeeeee no eres 😝"
-        :"Si sabesssss, tu puedesssss! 💙";
+      hint.textContent = intentos===1
+        ? "kheeeeeeeeee no eres 😝"
+        : "Si sabesssss, tu puedesssss! 💙";
     }
   };
 }
