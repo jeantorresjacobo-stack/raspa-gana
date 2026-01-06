@@ -14,7 +14,6 @@ body{
   font-family:'Segoe UI',Arial,sans-serif;
 }
 
-/* GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -25,7 +24,6 @@ body{
   height:100%;
 }
 
-/* CARD */
 .card{perspective:1200px}
 .card-inner{
   width:100%;height:100%;
@@ -48,18 +46,14 @@ body{
   white-space:pre-line;
 }
 
-.front{
-  background:linear-gradient(135deg,#1ecad3,#00a7b3);
-}
+.front{background:linear-gradient(135deg,#1ecad3,#00a7b3)}
 .back{
   background:linear-gradient(135deg,#b8ffff,#5ad7e6);
   transform:rotateY(180deg);
   color:#003b44;
 }
 
-canvas{
-  position:absolute;inset:0;border-radius:22px;
-}
+canvas{position:absolute;inset:0;border-radius:22px}
 
 .locked::after{
   content:"🔒";
@@ -68,7 +62,6 @@ canvas{
   z-index:5;
 }
 
-/* EXPLOSION */
 .explosion{
   position:absolute;inset:0;border-radius:22px;
   background:radial-gradient(circle,
@@ -84,7 +77,6 @@ canvas{
   100%{opacity:0;transform:scale(1.6)}
 }
 
-/* OVERLAY */
 .overlay{
   position:fixed;inset:0;z-index:1500;
   display:flex;align-items:center;justify-content:center;
@@ -111,19 +103,12 @@ canvas{
 }
 .hint{margin-top:18px;font-size:4.8vw;font-weight:800}
 
-/* FINAL */
 .final-screen{
   position:fixed;inset:0;z-index:3000;
   background:radial-gradient(circle,#b8ffff,#004b8d);
   display:flex;
   align-items:center;
   justify-content:center;
-  animation:finalIn .8s ease-out forwards;
-}
-
-@keyframes finalIn{
-  from{opacity:0;transform:scale(.8)}
-  to{opacity:1;transform:scale(1)}
 }
 
 .final-text{
@@ -131,18 +116,11 @@ canvas{
   font-size:6.5vw;
   font-weight:900;
   color:#003b44;
-
   max-width:85%;
   line-height:1.5;
-  letter-spacing:0.5px;
   white-space:pre-line;
-
-  padding:32px 24px;
-  margin:auto;
-
   animation:float 3s ease-in-out infinite;
 }
-
 @keyframes float{
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-10px)}
@@ -153,15 +131,12 @@ canvas{
 <body>
 
 <div class="grid" id="grid"></div>
-
-<!-- 🎶 CANCIÓN FINAL -->
 <audio id="finalSong" src="badbunny.mp3"></audio>
 
 <script>
-/* ===== CONFIG ===== */
 const mensajes=[
- "🫣 Sigue intentando\",
- "😉 Es una sorpresa \no tan sorpresa ",
+ "🫣 Sigue intentando",
+ "😉 Es una sorpresa \no tan sorpresa",
  "ADJETIVOS",
  "🧸 Sorpresa:\nUn Plincito 🙈🫰🏻",
  "📅 Anótalo bien:\n16 de enero",
@@ -172,47 +147,36 @@ const finalMensaje=`🎶 “Si te quieres divertir,
 con encanto y con primor…”
 
 💙🐰 Bad Bunny
-
-🎟️🎤 Concierto
-
-Para que disfrute y tenga
-más recuerdos bonitos`;
+🎟️🎤 Concierto`;
 
 const adjetivosValidos=[
  "mi compa","linda","guapa","pechocha","bonita",
  "inteligente","sonriente","risueña","ternurita"
 ];
 
-/* ===== UTIL ===== */
-const normalizar=t=>t.toLowerCase()
- .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
- .replace(/\s+/g,"");
+const normalizar=t=>t.toLowerCase().normalize("NFD")
+ .replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"");
 
 const validos=adjetivosValidos.map(normalizar);
-
 const grid=document.getElementById("grid");
 let currentIndex=0;
 
-/* ===== SONIDO RASPAR ===== */
 const AudioCtx=window.AudioContext||window.webkitAudioContext;
 const audioCtx=new AudioCtx();
 let osc=null;
 
 function startScratchSound(){
+  audioCtx.resume();
   if(osc) return;
   osc=audioCtx.createOscillator();
   const gain=audioCtx.createGain();
-  osc.type="triangle";
   osc.frequency.value=320;
   gain.gain.value=0.05;
   osc.connect(gain).connect(audioCtx.destination);
   osc.start();
 }
-function stopScratchSound(){
-  if(osc){osc.stop();osc=null;}
-}
+function stopScratchSound(){if(osc){osc.stop();osc=null;}}
 
-/* ===== CARDS ===== */
 function crearCard(index){
   const card=document.createElement("div");
   card.className="card";
@@ -229,64 +193,56 @@ function crearCard(index){
 
   const canvas=document.createElement("canvas");
   front.appendChild(canvas);
-
   inner.append(front,back);
   card.appendChild(inner);
   grid.appendChild(card);
 
-  const ctx=canvas.getContext("2d");
-  canvas.width=front.clientWidth;
-  canvas.height=front.clientHeight;
-  ctx.fillStyle="#b7f0f4";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.globalCompositeOperation="destination-out";
+  requestAnimationFrame(()=>{
+    canvas.width=front.clientWidth;
+    canvas.height=front.clientHeight;
+    const ctx=canvas.getContext("2d");
+    ctx.fillStyle="#b7f0f4";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.globalCompositeOperation="destination-out";
 
-  let draw=false;
+    let draw=false;
 
-  function scratch(e){
-    if(!draw||index!==currentIndex)return;
-    const r=canvas.getBoundingClientRect();
-    const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
-    const y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
-    ctx.beginPath();
-    ctx.arc(x,y,canvas.width*.25,0,Math.PI*2);
-    ctx.fill();
-  }
+    function scratch(e){
+      if(!draw||index!==currentIndex)return;
+      const r=canvas.getBoundingClientRect();
+      const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+      const y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+      ctx.beginPath();
+      ctx.arc(x,y,canvas.width*.25,0,Math.PI*2);
+      ctx.fill();
+    }
 
-  function check(){
-    const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-    let clear=0;
-    for(let i=3;i<img.data.length;i+=4) if(img.data[i]===0) clear++;
-    if(clear/(canvas.width*canvas.height)>0.35) unlock();
-  }
+    function check(){
+      const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+      let clear=0;
+      for(let i=3;i<img.data.length;i+=4) if(img.data[i]===0) clear++;
+      if(clear/(canvas.width*canvas.height)>0.35) unlock();
+    }
 
-  function unlock(){
-    canvas.remove();
-    front.classList.remove("locked");
-    card.classList.add("flip");
+    function unlock(){
+      canvas.remove();
+      front.classList.remove("locked");
+      card.classList.add("flip");
+      if(index===2) return mostrarOverlay(back);
+      if(index===5) return finalPantalla();
+      currentIndex++;
+    }
 
-    const boom=document.createElement("div");
-    boom.className="explosion";
-    card.appendChild(boom);
-    setTimeout(()=>boom.remove(),1100);
-
-    if(index===2){setTimeout(()=>mostrarOverlay(back),1200);return;}
-    if(index===5){setTimeout(finalPantalla,900);return;}
-
-    currentIndex++;
-  }
-
-  canvas.addEventListener("mousedown",()=>{if(index===currentIndex){draw=true;startScratchSound();}});
-  canvas.addEventListener("mousemove",scratch);
-  canvas.addEventListener("mouseup",()=>{draw=false;stopScratchSound();check();});
-  canvas.addEventListener("touchstart",()=>{if(index===currentIndex){draw=true;startScratchSound();}});
-  canvas.addEventListener("touchmove",scratch);
-  canvas.addEventListener("touchend",()=>{draw=false;stopScratchSound();check();});
+    canvas.onmousedown=()=>{if(index===currentIndex){draw=true;startScratchSound();}};
+    canvas.onmousemove=scratch;
+    canvas.onmouseup=()=>{draw=false;stopScratchSound();check();};
+    canvas.ontouchstart=()=>{draw=true;startScratchSound();};
+    canvas.ontouchmove=scratch;
+    canvas.ontouchend=()=>{draw=false;stopScratchSound();check();};
+  });
 }
 
-/* ===== OVERLAY ADJETIVOS ===== */
 function mostrarOverlay(back){
-  let intentos=0;
   const overlay=document.createElement("div");
   overlay.className="overlay";
   overlay.innerHTML=`
@@ -298,39 +254,22 @@ function mostrarOverlay(back){
     </div>`;
   document.body.appendChild(overlay);
 
-  const btn=overlay.querySelector(".check");
-  const hint=overlay.querySelector(".hint");
-  const inputs=[...overlay.querySelectorAll(".word")];
-
-  btn.onclick=()=>{
-    intentos++;
-    const values=inputs.map(i=>i.value);
-    const ok=values.map(normalizar).every(v=>validos.includes(v));
-
-    if(ok){
-      hint.textContent="Muy biennnn!!!! Ya vesssss 💙✨";
+  overlay.querySelector(".check").onclick=()=>{
+    const values=[...overlay.querySelectorAll(".word")].map(i=>i.value);
+    if(values.map(normalizar).every(v=>validos.includes(v))){
       back.innerHTML=`💙 Siempre eres:\n\n${values.join("\n")}`;
-      setTimeout(()=>{
-        overlay.remove();
-        currentIndex++;
-      },1200);
-    }else{
-      hint.textContent=intentos===1
-        ?"kheeeeeeeeee no eres 😝"
-        :"Si sabesssss, tu puedesssss! 💙";
+      overlay.remove();
+      currentIndex++;
     }
   };
 }
 
-/* ===== FINAL ===== */
 function finalPantalla(){
   const fs=document.createElement("div");
   fs.className="final-screen";
   fs.innerHTML=`<div class="final-text">${finalMensaje}</div>`;
   document.body.appendChild(fs);
-
-  const song=document.getElementById("finalSong");
-  song.play().catch(()=>{});
+  document.getElementById("finalSong").play().catch(()=>{});
 }
 
 mensajes.forEach((_,i)=>crearCard(i));
