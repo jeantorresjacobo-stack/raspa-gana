@@ -51,7 +51,6 @@ body{
 .front{
   background:linear-gradient(135deg,#1ecad3,#00a7b3);
   color:#003b44;
-  box-shadow:0 8px 18px rgba(0,0,0,.25);
 }
 
 .back{
@@ -60,10 +59,8 @@ body{
   transform:rotateY(180deg);
 }
 
-/* FINAL */
 .final{
   font-family:Georgia,serif;
-  font-size:5.4vw;
 }
 
 /* CANVAS */
@@ -82,25 +79,20 @@ canvas{
   z-index:3;
 }
 
-/* EXPLOSIÓN */
+/* 💥 EXPLOSIÓN CELULAR */
 .explosion{
   position:absolute;
-  width:20px;height:20px;
-  border-radius:50%;
-  background:#fff;
-  left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  animation:boom .8s ease-out forwards;
+  inset:0;
+  border-radius:22px;
+  background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(111,252,255,.7) 30%, rgba(111,252,255,0) 70%);
+  animation:boom 1s ease-out forwards;
   pointer-events:none;
 }
 
 @keyframes boom{
-  0%{opacity:1;box-shadow:0 0 0 0 #6ffcff}
-  100%{
-    opacity:0;
-    box-shadow:0 0 0 40px rgba(111,252,255,0),
-               0 0 60px 30px rgba(111,252,255,.5);
-  }
+  0%{opacity:0;transform:scale(.3)}
+  40%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.4)}
 }
 
 /* PLINCITO */
@@ -113,30 +105,60 @@ canvas{
   100%{transform:scale(1)}
 }
 
-/* ADJETIVOS */
+/* 📝 OVERLAY PANTALLA COMPLETA */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,#002b5c,#004b8d);
+  z-index:999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:24px;
+  animation:fadeIn .5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+.overlay-box{
+  background:linear-gradient(135deg,#b8ffff,#5ad7e6);
+  border-radius:28px;
+  padding:28px;
+  width:100%;
+  max-width:420px;
+  font-size:6vw;
+  font-weight:700;
+  color:#003b44;
+}
+
 .word{
   width:28%;
-  padding:6px;
-  margin:4px;
-  border-radius:10px;
+  padding:10px;
+  margin:6px;
+  border-radius:14px;
   border:none;
   text-align:center;
-  font-size:4vw;
+  font-size:5vw;
 }
 
 .check{
-  margin-top:8px;
-  padding:8px 14px;
+  margin-top:14px;
+  padding:12px 20px;
   border:none;
-  border-radius:14px;
+  border-radius:20px;
   background:#004b8d;
   color:white;
   font-weight:700;
+  font-size:4.5vw;
 }
 
 .hint{
-  margin-top:6px;
-  font-size:3.5vw;
+  margin-top:12px;
+  font-size:4vw;
 }
 </style>
 </head>
@@ -146,7 +168,7 @@ canvas{
 <div class="grid" id="grid"></div>
 
 <script>
-// ✨ CAMBIA ESTOS ADJETIVOS POR LOS TUYOS
+// ✨ CAMBIA ESTOS ADJETIVOS
 const adjetivosCorrectos = ["hermosa","única","increíble"];
 
 const mensajes = [
@@ -173,22 +195,7 @@ function crearCard(index){
 
   const back=document.createElement("div");
   back.className="face back";
-
-  if(index===2){
-    back.innerHTML=`
-      💭 Completa lo que siempre te digo…<br><br>
-      Eres<br><br>
-      <input class="word" placeholder="___">
-      <input class="word" placeholder="___">
-      <input class="word" placeholder="___">
-      <br><br>
-      <button class="check">Comprobar 💙</button>
-      <p class="hint"></p>
-    `;
-  }else{
-    back.textContent=mensajes[index];
-  }
-
+  if(index!==2) back.textContent=mensajes[index];
   if(index===5) back.classList.add("final");
 
   const canvas=document.createElement("canvas");
@@ -200,33 +207,29 @@ function crearCard(index){
   grid.appendChild(card);
 
   const ctx=canvas.getContext("2d");
-
-  function resize(){
-    canvas.width=front.clientWidth;
-    canvas.height=front.clientHeight;
-    ctx.fillStyle="#b7f0f4";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.globalCompositeOperation="destination-out";
-  }
-  resize();
+  canvas.width=front.clientWidth;
+  canvas.height=front.clientHeight;
+  ctx.fillStyle="#b7f0f4";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.globalCompositeOperation="destination-out";
 
   let draw=false;
+
   function scratch(e){
     if(!draw||index!==currentIndex)return;
     const r=canvas.getBoundingClientRect();
     const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
     const y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
     ctx.beginPath();
-    ctx.arc(x,y,canvas.width*.18,0,Math.PI*2);
+    ctx.arc(x,y,canvas.width*.2,0,Math.PI*2);
     ctx.fill();
   }
 
   function check(){
     const img=ctx.getImageData(0,0,canvas.width,canvas.height);
     let clear=0;
-    for(let i=3;i<img.data.length;i+=4)
-      if(img.data[i]===0)clear++;
-    if(clear/(canvas.width*canvas.height)>0.35)unlock();
+    for(let i=3;i<img.data.length;i+=4) if(img.data[i]===0) clear++;
+    if(clear/(canvas.width*canvas.height)>0.35) unlock();
   }
 
   function unlock(){
@@ -237,22 +240,10 @@ function crearCard(index){
     const boom=document.createElement("div");
     boom.className="explosion";
     card.appendChild(boom);
-    setTimeout(()=>boom.remove(),800);
+    setTimeout(()=>boom.remove(),1000);
 
     if(index===2){
-      const btn=back.querySelector(".check");
-      const inputs=back.querySelectorAll(".word");
-      const hint=back.querySelector(".hint");
-
-      btn.addEventListener("click",()=>{
-        const values=[...inputs].map(i=>i.value.toLowerCase().trim());
-        if(values.every(v=>adjetivosCorrectos.includes(v))){
-          hint.textContent="💙 Exacto… siempre lo has sabido";
-          currentIndex++;
-        }else{
-          hint.textContent="😉 Pista: te lo digo más de lo que crees";
-        }
-      });
+      mostrarOverlay();
       return;
     }
 
@@ -267,6 +258,41 @@ function crearCard(index){
   canvas.addEventListener("mousedown",()=>{if(index===currentIndex)draw=true});
   canvas.addEventListener("mousemove",scratch);
   canvas.addEventListener("mouseup",()=>{draw=false;check()});
+}
+
+function mostrarOverlay(){
+  const overlay=document.createElement("div");
+  overlay.className="overlay";
+  overlay.innerHTML=`
+    <div class="overlay-box">
+      💭 Completa lo que siempre te digo…<br><br>
+      Eres<br><br>
+      <input class="word">
+      <input class="word">
+      <input class="word">
+      <br>
+      <button class="check">Comprobar 💙</button>
+      <div class="hint"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const btn=overlay.querySelector(".check");
+  const inputs=overlay.querySelectorAll(".word");
+  const hint=overlay.querySelector(".hint");
+
+  btn.onclick=()=>{
+    const values=[...inputs].map(i=>i.value.toLowerCase().trim());
+    if(values.every(v=>adjetivosCorrectos.includes(v))){
+      hint.textContent="💙 Exacto… siempre lo has sabido";
+      setTimeout(()=>{
+        overlay.remove();
+        currentIndex++;
+      },800);
+    }else{
+      hint.textContent="😉 Pista: te lo digo más de lo que crees";
+    }
+  };
 }
 
 mensajes.forEach((_,i)=>crearCard(i));
