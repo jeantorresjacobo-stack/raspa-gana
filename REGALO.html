@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Un pequeño detalle para ti 💙</title>
+<title>Un pequeño detalle 💙</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -25,18 +24,16 @@ body{
   height:100%;
 }
 
-.card{perspective:1200px;position:relative}
+.card{perspective:1200px}
 .card-inner{
-  width:100%;
-  height:100%;
+  width:100%;height:100%;
   transform-style:preserve-3d;
   transition:transform .9s cubic-bezier(.4,1.6,.4,1);
 }
 .card.flip .card-inner{transform:rotateY(180deg)}
 
 .face{
-  position:absolute;
-  inset:0;
+  position:absolute;inset:0;
   border-radius:22px;
   backface-visibility:hidden;
   display:flex;
@@ -52,7 +49,6 @@ body{
 .front{
   background:linear-gradient(135deg,#1ecad3,#00a7b3);
 }
-
 .back{
   background:linear-gradient(135deg,#b8ffff,#5ad7e6);
   transform:rotateY(180deg);
@@ -60,9 +56,7 @@ body{
 }
 
 canvas{
-  position:absolute;
-  inset:0;
-  border-radius:22px;
+  position:absolute;inset:0;border-radius:22px;
 }
 
 .locked::after{
@@ -72,11 +66,9 @@ canvas{
   z-index:5;
 }
 
-/* EXPLOSION NORMAL */
+/* EXPLOSION */
 .explosion{
-  position:absolute;
-  inset:0;
-  border-radius:22px;
+  position:absolute;inset:0;border-radius:22px;
   background:radial-gradient(circle,
     rgba(255,255,255,1) 0%,
     rgba(111,252,255,.8) 40%,
@@ -84,30 +76,50 @@ canvas{
   animation:boom 1.1s ease-out forwards;
   pointer-events:none;
 }
-
 @keyframes boom{
   0%{opacity:0;transform:scale(.4)}
   50%{opacity:1;transform:scale(1)}
   100%{opacity:0;transform:scale(1.6)}
 }
 
-/* FINAL FULLSCREEN */
+/* OVERLAY */
+.overlay{
+  position:fixed;inset:0;z-index:1500;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#002b5c,#004b8d);
+}
+.overlay-box{
+  background:linear-gradient(135deg,#b8ffff,#5ad7e6);
+  border-radius:32px;
+  padding:34px 26px;
+  width:90%;max-width:420px;
+  text-align:center;
+}
+.overlay-title{font-size:6vw;font-weight:900;margin-bottom:20px}
+.word{
+  width:100%;padding:16px;margin:10px 0;
+  border-radius:20px;border:none;
+  text-align:center;font-size:5vw;font-weight:700;
+}
+.check{
+  margin-top:18px;padding:16px;width:100%;
+  border:none;border-radius:26px;
+  background:#004b8d;color:white;
+  font-size:5vw;font-weight:900;
+}
+.hint{margin-top:18px;font-size:4.8vw;font-weight:800}
+
+/* FINAL */
 .final-screen{
-  position:fixed;
-  inset:0;
-  z-index:2000;
-  background:radial-gradient(circle at center,#b8ffff,#004b8d);
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  position:fixed;inset:0;z-index:3000;
+  background:radial-gradient(circle,#b8ffff,#004b8d);
+  display:flex;align-items:center;justify-content:center;
   animation:finalIn .8s ease-out forwards;
 }
-
 @keyframes finalIn{
   from{opacity:0;transform:scale(.8)}
   to{opacity:1;transform:scale(1)}
 }
-
 .final-text{
   text-align:center;
   font-size:6.5vw;
@@ -116,65 +128,9 @@ canvas{
   animation:float 3s ease-in-out infinite;
   padding:20px;
 }
-
 @keyframes float{
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-10px)}
-}
-
-/* OVERLAY ADJETIVOS */
-.overlay{
-  position:fixed;
-  inset:0;
-  z-index:1500;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(180deg,#002b5c,#004b8d);
-}
-
-.overlay-box{
-  background:linear-gradient(135deg,#b8ffff,#5ad7e6);
-  border-radius:32px;
-  padding:34px 26px;
-  width:100%;
-  max-width:420px;
-  text-align:center;
-}
-
-.overlay-title{
-  font-size:6vw;
-  font-weight:900;
-  margin-bottom:20px;
-}
-
-.word{
-  width:100%;
-  padding:16px;
-  margin:10px 0;
-  border-radius:20px;
-  border:none;
-  text-align:center;
-  font-size:5vw;
-  font-weight:700;
-}
-
-.check{
-  margin-top:18px;
-  padding:16px;
-  width:100%;
-  border:none;
-  border-radius:26px;
-  background:#004b8d;
-  color:white;
-  font-size:5vw;
-  font-weight:900;
-}
-
-.hint{
-  margin-top:18px;
-  font-size:4.8vw;
-  font-weight:800;
 }
 </style>
 </head>
@@ -183,13 +139,17 @@ canvas{
 
 <div class="grid" id="grid"></div>
 
+<!-- 🎶 CANCIÓN FINAL -->
+<audio id="finalSong" src="badbunny.mp3"></audio>
+
 <script>
+/* ===== CONFIG ===== */
 const mensajes=[
  "😅 Sigue intentando\nesto recién empieza",
  "😉 Vamos de nuevo\nconfía en mí",
  "ADJETIVOS",
  "🧸 Sorpresa:\nUn peluchito Plincito 💙",
- "📅 Anótalo bien:\n16 de enero",
+ "📅 Anótalo bien:\n16 de enero 🎟️🎤",
  "FINAL"
 ];
 
@@ -198,6 +158,7 @@ con encanto y con primor…”
 
 💙🐰 Bad Bunny
 
+🎟️🎤 Concierto
 Porque contigo
 todo se siente especial`;
 
@@ -206,6 +167,7 @@ const adjetivosValidos=[
  "inteligente","sonriente","risueña","ternurita"
 ];
 
+/* ===== UTIL ===== */
 const normalizar=t=>t.toLowerCase()
  .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
  .replace(/\s+/g,"");
@@ -215,6 +177,26 @@ const validos=adjetivosValidos.map(normalizar);
 const grid=document.getElementById("grid");
 let currentIndex=0;
 
+/* ===== SONIDO RASPAR ===== */
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+const audioCtx=new AudioCtx();
+let osc=null;
+
+function startScratchSound(){
+  if(osc) return;
+  osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.type="triangle";
+  osc.frequency.value=320;
+  gain.gain.value=0.05;
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+}
+function stopScratchSound(){
+  if(osc){osc.stop();osc=null;}
+}
+
+/* ===== CARDS ===== */
 function crearCard(index){
   const card=document.createElement("div");
   card.className="card";
@@ -227,7 +209,7 @@ function crearCard(index){
 
   const back=document.createElement("div");
   back.className="face back";
-  if(index!==5 && index!==2) back.textContent=mensajes[index];
+  if(index!==2 && index!==5) back.textContent=mensajes[index];
 
   const canvas=document.createElement("canvas");
   front.appendChild(canvas);
@@ -272,31 +254,32 @@ function crearCard(index){
     card.appendChild(boom);
     setTimeout(()=>boom.remove(),1100);
 
-    if(index===2){setTimeout(mostrarOverlay,1200);return;}
+    if(index===2){setTimeout(()=>mostrarOverlay(back),1200);return;}
     if(index===5){setTimeout(finalPantalla,900);return;}
 
     currentIndex++;
   }
 
-  canvas.addEventListener("mousedown",()=>{if(index===currentIndex)draw=true});
+  canvas.addEventListener("mousedown",()=>{if(index===currentIndex){draw=true;startScratchSound();}});
   canvas.addEventListener("mousemove",scratch);
-  canvas.addEventListener("mouseup",()=>{draw=false;check()});
-  canvas.addEventListener("touchstart",()=>{if(index===currentIndex)draw=true});
+  canvas.addEventListener("mouseup",()=>{draw=false;stopScratchSound();check();});
+  canvas.addEventListener("touchstart",()=>{if(index===currentIndex){draw=true;startScratchSound();}});
   canvas.addEventListener("touchmove",scratch);
-  canvas.addEventListener("touchend",()=>{draw=false;check()});
+  canvas.addEventListener("touchend",()=>{draw=false;stopScratchSound();check();});
 }
 
-function mostrarOverlay(){
+/* ===== OVERLAY ADJETIVOS ===== */
+function mostrarOverlay(back){
   let intentos=0;
   const overlay=document.createElement("div");
   overlay.className="overlay";
   overlay.innerHTML=`
-  <div class="overlay-box">
-    <div class="overlay-title">💭 Completa lo que siempre te digo…</div>
-    <input class="word"><input class="word"><input class="word">
-    <button class="check">Comprobar 💙</button>
-    <div class="hint"></div>
-  </div>`;
+    <div class="overlay-box">
+      <div class="overlay-title">💭 Completa lo que siempre te digo…</div>
+      <input class="word"><input class="word"><input class="word">
+      <button class="check">Comprobar 💙</button>
+      <div class="hint"></div>
+    </div>`;
   document.body.appendChild(overlay);
 
   const btn=overlay.querySelector(".check");
@@ -305,28 +288,33 @@ function mostrarOverlay(){
 
   btn.onclick=()=>{
     intentos++;
-    const ok=inputs.map(i=>normalizar(i.value))
-      .every(v=>validos.includes(v));
+    const values=inputs.map(i=>i.value);
+    const ok=values.map(normalizar).every(v=>validos.includes(v));
 
     if(ok){
       hint.textContent="Muy biennnn!!!! Ya vesssss 💙✨";
+      back.innerHTML=`💙 Siempre eres:\n\n${values.join("\n")}`;
       setTimeout(()=>{
         overlay.remove();
         currentIndex++;
-      },1400);
+      },1200);
     }else{
       hint.textContent=intentos===1
-       ?"kheeeeeeeeee no eres 😝"
-       :"Si sabesssss, tu puedesssss! 💙";
+        ?"kheeeeeeeeee no eres 😝"
+        :"Si sabesssss, tu puedesssss! 💙";
     }
   };
 }
 
+/* ===== FINAL ===== */
 function finalPantalla(){
   const fs=document.createElement("div");
   fs.className="final-screen";
   fs.innerHTML=`<div class="final-text">${finalMensaje}</div>`;
   document.body.appendChild(fs);
+
+  const song=document.getElementById("finalSong");
+  song.play().catch(()=>{});
 }
 
 mensajes.forEach((_,i)=>crearCard(i));
