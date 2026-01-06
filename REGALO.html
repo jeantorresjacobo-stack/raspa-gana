@@ -5,7 +5,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Un pequeño detalle para ti ❤️</title>
+<title>Un pequeño detalle para ti 💙</title>
 
 <style>
   * {
@@ -17,9 +17,9 @@
   body {
     width: 100vw;
     height: 100vh;
-    background: #0f0f0f;
+    background: linear-gradient(180deg, #002b5c, #004b8d);
     overflow: hidden;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
   }
 
   .grid {
@@ -28,23 +28,25 @@
     grid-template-rows: repeat(3, 1fr);
     width: 100vw;
     height: 100vh;
-    gap: 8px;
-    padding: 8px;
+    gap: 10px;
+    padding: 10px;
   }
 
   .cell {
     position: relative;
-    background: linear-gradient(135deg, #ffd700, #ff9900);
+    background: linear-gradient(135deg, #1ecad3, #00a7b3);
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 12px;
+    padding: 14px;
     font-size: 5vw;
-    font-weight: bold;
-    border-radius: 18px;
+    font-weight: 700;
+    border-radius: 20px;
     overflow: hidden;
-    color: #111;
+    color: #003b44;
+    box-shadow: 0 8px 18px rgba(0,0,0,.25);
+    white-space: pre-line;
   }
 
   canvas {
@@ -58,6 +60,7 @@
     position: absolute;
     font-size: 12vw;
     z-index: 2;
+    opacity: .9;
   }
 </style>
 </head>
@@ -68,17 +71,21 @@
 
 <script>
 /*
-  MENSAJE CON CARIÑO
-  Cumple: 28 de enero
-  Evento: 16 de enero (12 días antes)
+  ORDEN DE REVELADO 💙
+  1️⃣ Sigue intentando
+  2️⃣ Sigue intentando
+  3️⃣ 🧸 Plincito
+  4️⃣ Pista cumpleaños
+  5️⃣ Fecha
+  6️⃣ Bad Bunny
 */
 const mensajes = [
-  "😅 Sigue intentando\n(esto recién empieza)",
-  "😉 Vamos de nuevo,\nvale la pena",
-  "💭 Pista: es algo que ya hablamos\ny que te hace ilusión",
-  "🎂 Sucede 12 días antes\nde tu cumpleaños",
+  "😅 Sigue intentando\nesto recién empieza",
+  "😉 Vamos de nuevo\nconfía en mí",
+  "🧸 Sorpresa:\nUn peluchito Plincito\npara ti 💙",
+  "🎂 Pista:\nPasa 12 días antes\nde tu cumpleaños",
   "📅 Anótalo bien:\n16 de enero",
-  "❤️ Es oficial:\nTu entrada para ver a Bad Bunny"
+  "🎤 Es oficial:\nTu entrada para ver a Bad Bunny 💙"
 ];
 
 const grid = document.getElementById("grid");
@@ -100,7 +107,7 @@ function crearCuadro(index) {
     canvas.height = cell.clientHeight;
 
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#999";
+    ctx.fillStyle = "#b7f0f4";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.globalCompositeOperation = "destination-out";
   }
@@ -119,7 +126,7 @@ function crearCuadro(index) {
     const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
     ctx.beginPath();
-    ctx.arc(x, y, canvas.width * 0.16, 0, Math.PI * 2); // raspado rápido
+    ctx.arc(x, y, canvas.width * 0.17, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -143,7 +150,6 @@ function crearCuadro(index) {
     }
   }
 
-  // Touch (iPhone)
   canvas.addEventListener("touchstart", () => {
     if (index !== currentIndex) return;
     isDrawing = true;
@@ -155,8 +161,11 @@ function crearCuadro(index) {
     checkScratch();
   });
 
-  // Mouse
-  canvas.addEventListener("mousedown", () => isDrawing = true);
+  canvas.addEventListener("mousedown", () => {
+    if (index !== currentIndex) return;
+    isDrawing = true;
+  });
+
   canvas.addEventListener("mousemove", draw);
   canvas.addEventListener("mouseup", () => {
     isDrawing = false;
