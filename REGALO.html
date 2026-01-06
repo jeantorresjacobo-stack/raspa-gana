@@ -9,11 +9,15 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
 body{
-  width:100vw;height:100vh;
   background:linear-gradient(180deg,#002b5c,#004b8d);
   font-family:'Segoe UI',Arial,sans-serif;
-  overflow:hidden;
 }
 
 .grid{
@@ -22,19 +26,24 @@ body{
   grid-template-rows:repeat(3,1fr);
   gap:12px;
   padding:12px;
-  width:100vw;height:100vh;
+  width:100%;
+  height:100%;
 }
 
+/* CARD */
 .card{perspective:1000px}
 .card-inner{
-  position:relative;width:100%;height:100%;
+  position:relative;
+  width:100%;
+  height:100%;
   transform-style:preserve-3d;
   transition:transform .9s cubic-bezier(.4,1.6,.4,1);
 }
 .card.flip .card-inner{transform:rotateY(180deg)}
 
 .face{
-  position:absolute;inset:0;
+  position:absolute;
+  inset:0;
   border-radius:22px;
   backface-visibility:hidden;
   display:flex;
@@ -77,9 +86,14 @@ canvas{
   position:absolute;
   inset:0;
   border-radius:22px;
-  background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(111,252,255,.7) 35%, rgba(111,252,255,0) 75%);
+  background:radial-gradient(circle,
+    rgba(255,255,255,.95) 0%,
+    rgba(111,252,255,.7) 40%,
+    rgba(111,252,255,0) 75%);
   animation:boom 1s ease-out forwards;
+  pointer-events:none;
 }
+
 @keyframes boom{
   0%{opacity:0;transform:scale(.4)}
   50%{opacity:1;transform:scale(1)}
@@ -90,18 +104,17 @@ canvas{
 .overlay{
   position:fixed;
   inset:0;
-  background:linear-gradient(180deg,#002b5c,#004b8d);
   z-index:999;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:24px;
+  background:linear-gradient(180deg,#002b5c,#004b8d);
 }
 
 .overlay-box{
   background:linear-gradient(135deg,#b8ffff,#5ad7e6);
-  border-radius:30px;
-  padding:32px 24px;
+  border-radius:32px;
+  padding:34px 26px;
   width:100%;
   max-width:420px;
   text-align:center;
@@ -111,14 +124,14 @@ canvas{
 .overlay-title{
   font-size:6vw;
   font-weight:800;
-  margin-bottom:20px;
+  margin-bottom:22px;
 }
 
 .word{
   width:100%;
-  padding:14px;
-  margin:10px 0;
-  border-radius:18px;
+  padding:16px;
+  margin:12px 0;
+  border-radius:20px;
   border:none;
   text-align:center;
   font-size:5vw;
@@ -127,11 +140,11 @@ canvas{
 }
 
 .check{
-  margin-top:18px;
-  padding:14px;
+  margin-top:20px;
+  padding:16px;
   width:100%;
   border:none;
-  border-radius:22px;
+  border-radius:26px;
   background:#004b8d;
   color:white;
   font-weight:800;
@@ -139,8 +152,9 @@ canvas{
 }
 
 .hint{
-  margin-top:16px;
-  font-size:4.5vw;
+  margin-top:18px;
+  font-size:4.6vw;
+  font-weight:700;
 }
 </style>
 </head>
@@ -151,21 +165,18 @@ canvas{
 
 <script>
 // 💙 ADJETIVOS VÁLIDOS
-const adjetivosValidos = [
-  "mi compa","linda","guapa","pechocha","bonita",
-  "inteligente","sonriente","risueña","ternurita"
+const adjetivosValidos=[
+ "mi compa","linda","guapa","pechocha","bonita",
+ "inteligente","sonriente","risueña","ternurita"
 ];
 
-// 🔧 NORMALIZADOR
-function normalizar(texto){
-  return texto
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"")
-    .replace(/\s+/g,"");
-}
+// NORMALIZAR
+const normalizar=t=>t.toLowerCase()
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g,"")
+  .replace(/\s+/g,"");
 
-const validosNormalizados = adjetivosValidos.map(normalizar);
+const validosNormalizados=adjetivosValidos.map(normalizar);
 
 const mensajes=[
  "😅 Sigue intentando\nesto recién empieza",
@@ -253,6 +264,7 @@ function crearCard(index){
 
 function mostrarOverlay(){
   let intentos=0;
+
   const overlay=document.createElement("div");
   overlay.className="overlay";
   overlay.innerHTML=`
@@ -275,14 +287,18 @@ function mostrarOverlay(){
     const values=[...inputs].map(i=>normalizar(i.value));
     intentos++;
 
-    const ok = values.every(v=>validosNormalizados.includes(v));
+    const ok=values.every(v=>validosNormalizados.includes(v));
 
     if(ok){
-      hint.textContent="💙 Exacto… siempre lo has sabido";
+      hint.textContent="Muy biennnn!!!! Ya vesssss 💙✨";
       setTimeout(()=>{
-        overlay.remove();
-        currentIndex++;
-      },900);
+        overlay.style.opacity="0";
+        overlay.style.transition="opacity .4s";
+        setTimeout(()=>{
+          overlay.remove();
+          currentIndex++;
+        },400);
+      },1600);
     }else{
       hint.textContent = intentos===1
         ? "kheeeeeeeeee no eres 😝"
